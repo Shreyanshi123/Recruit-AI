@@ -1,38 +1,52 @@
 # RecruitAI
 
-RecruitAI is an AI-powered technical hiring platform for evaluating engineering candidates in a secure, structured, and auditable way.
+RecruitAI is an AI-powered technical hiring platform for evaluating software engineering candidates in a secure, structured, and auditable way.
 
-The project combines:
-- a FastAPI backend for interview orchestration, assessment management, analytics, and authentication
+It combines:
+- a FastAPI backend for interviews, assessments, analytics, authentication, and sandbox execution
 - a React + TypeScript frontend for recruiter and candidate experiences
-- an AI evaluation pipeline under `ai_engine/` for rubric retrieval, guardrails, sandbox execution, and scoring
+- an AI evaluation pipeline under `ai_engine/` for rubric retrieval, guardrails, scoring, and integrity checks
 - SQLite-backed persistence for sessions, assessments, and telemetry
-- Docker-based deployment support for local and production setups
+- Docker support for local deployment and production-style packaging
 
-## Product overview
+## Overview
 
-RecruitAI supports the full hiring workflow:
+RecruitAI is designed to help engineering teams move beyond generic chat-based LLMs and run structured technical evaluation workflows. The platform supports:
 - resume and job description gap analysis
-- interview/question generation
+- interview and question generation
 - candidate coding tasks and live evaluation
 - security and integrity checks for candidate submissions
-- recruiter-facing assessment creation and candidate result review
-- analytics and auditability across sessions
+- recruiter-facing assessment creation and candidate review
+- analytics and audit trails for hiring decisions
 
 ## Architecture
 
-- `backend/` — FastAPI application and business logic
-  - `backend/api/` — routers for auth, interviews, assessments, analytics, and sandbox execution
-  - `backend/core/` — application config and shared settings
-  - `backend/repositories/` — SQLite repository logic
-  - `backend/services/` — backend service layer
-  - `backend/main.py` — app bootstrap and static asset serving
-- `ai_engine/` — AI and evaluation modules
-  - guardrails, sandbox analysis, hybrid retrieval, and scoring workflows
-- `frontend/` — Vite + React + TypeScript UI
-- `tests/` — pipeline and assessment validation tests
-- `requirements.txt` — Python dependencies
-- `Dockerfile` and `docker-compose.yml` — containerized deployment
+### Backend
+The backend is built with FastAPI and lives in `backend/`.
+
+Key components:
+- `backend/api/` — auth, interviews, assessments, analytics, and sandbox routes
+- `backend/core/` — shared configuration and app settings
+- `backend/repositories/` — data access and SQLite repository logic
+- `backend/services/` — service layer logic
+- `backend/main.py` — application startup and static asset serving
+
+### AI engine
+The AI evaluation stack is organized under `ai_engine/` and includes:
+- guardrails and prompt defense
+- rubric retrieval and scoring workflows
+- sandbox analysis and execution logic
+- integrity checks and validation flows
+
+### Frontend
+The frontend is a Vite + React + TypeScript app under `frontend/` and provides the recruiter and candidate UI.
+
+### Tests
+The repository includes automated validation under `tests/` covering:
+- assessment workflows
+- enterprise pipeline checks
+- guardrails and scoring behavior
+- code-analysis and security expectations
 
 ## Repository structure
 
@@ -67,30 +81,52 @@ Recruit-AI/
 │   └── test_enterprise_pipeline.py
 ├── Dockerfile
 ├── docker-compose.yml
+├── requirements.txt
 ├── fine_tuning_dataset.jsonl
 ├── hireroom_ledger.db
-├── requirements.txt
 ├── README.md
-└── .gitignore
+├── .gitignore
+└── ...
 ```
 
+## Tech stack
+
+### Backend
+- Python
+- FastAPI
+- Uvicorn
+- SQLite
+- LangGraph
+- ChromaDB
+- Pydantic
+- Google GenAI
+
+### Frontend
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- Lucide React
+
 ## Prerequisites
+
+Before running the project, make sure you have:
 
 - Python 3.11+
 - Node.js 18+
 - npm
-- Optional: Docker and Docker Compose
+- Docker (optional, for containerized deployment)
 
-## Local setup
+## Local development setup
 
-1. Clone the repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Shreyanshi123/Recruit-AI.git
 cd Recruit-AI
 ```
 
-2. Create a virtual environment and install Python dependencies
+### 2. Create a virtual environment and install Python dependencies
 
 ```bash
 python -m venv .venv
@@ -98,7 +134,9 @@ source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-3. Add environment variables in a `.env` file
+### 3. Configure environment variables
+
+Create a `.env` file in the project root:
 
 ```env
 ENVIRONMENT=development
@@ -106,7 +144,7 @@ GEMINI_API_KEY=your_google_api_key_here
 GEMINI_MODEL=gemini-2.5-flash
 ```
 
-4. Start the backend
+### 4. Start the backend
 
 ```bash
 uvicorn backend.main:app --reload --port 8000
@@ -116,7 +154,7 @@ The API will be available at:
 - http://localhost:8000
 - Swagger docs: http://localhost:8000/docs
 
-5. Start the frontend
+### 5. Start the frontend
 
 ```bash
 cd frontend
@@ -124,35 +162,35 @@ npm install
 npm run dev
 ```
 
-The frontend runs on:
+The frontend runs at:
 - http://localhost:5173
 
 ## Main application routes
 
-- `/` — serves the app or API status page
+- `/` — app entry or status page
 - `/hire` — recruiter console
 - `/a/{public_token}` — candidate assessment page
-- `/docs` — FastAPI OpenAPI docs
+- `/docs` — FastAPI OpenAPI documentation
 
-## Docker
+## Docker deployment
 
-Build and run the application in a container:
+Build and run the app with Docker Compose:
 
 ```bash
 docker compose up --build
 ```
 
-This uses the included `Dockerfile` and exposes the app on port `8000`.
+This uses the included `Dockerfile` and exposes the application on port `8000`.
 
 ## Testing
 
-Run the automated validation suite:
+Run the automated integration and evaluation suite:
 
 ```bash
 pytest tests/test_enterprise_pipeline.py
 ```
 
-You can also run the assessment-focused checks directly:
+Run assessment-focused checks:
 
 ```bash
 python tests/test_assessments.py
@@ -160,10 +198,11 @@ python tests/test_assessments.py
 
 ## Notes
 
-- The backend uses SQLite for local persistence and app-ledger storage.
-- The project includes sandboxing and code-analysis logic for technical evaluation integrity.
-- The frontend is built with Vite and can be served via the FastAPI app when production assets are present.
+- The backend initializes SQLite schema and app persistence on startup.
+- The app includes code analysis and sandbox logic for secure technical evaluation.
+- The frontend is served from the FastAPI app when built assets are present.
+- Some functionality depends on valid AI credentials and model configuration.
 
 ## License
 
-This project is currently distributed without an explicit license file in the repository root. If you plan to reuse or redistribute it, confirm the licensing terms with the repository owner before publishing or deploying externally.
+This repository does not currently include a root-level license file. If you plan to reuse or redistribute this project, confirm the license terms with the repository owner before public or commercial use.
