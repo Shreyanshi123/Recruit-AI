@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+google-genai
+langgraph
+chromadb
+pydantic
+python-dotenv

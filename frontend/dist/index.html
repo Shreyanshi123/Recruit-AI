@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RecruitAI — Agentic AI Technical Interview & Company Question Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- PDF.js for client-side PDF resume/JD text extraction -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+      :root {
+        --bg-canvas: #F4F6FA;
+        --bg-card: #FFFFFF;
+        --bg-subtle: #F8FAFC;
+        --text-primary: #0F172A;
+        --text-secondary: #475569;
+        --text-muted: #64748B;
+        --accent-primary: #2563EB;
+        --accent-pass: #059669;
+        --accent-fail: #E11D48;
+        --accent-amber: #D97706;
+        --border-subtle: #E2E8F0;
+        --border-strong: #CBD5E1;
+        --card-shadow: 0 1px 3px rgba(15, 23, 42, 0.03), 0 8px 24px -4px rgba(15, 23, 42, 0.05);
+        --card-hover-shadow: 0 4px 12px rgba(15, 23, 42, 0.06), 0 16px 32px -6px rgba(37, 99, 235, 0.08);
+      }
+
+      html.dark {
+        --bg-canvas: #090A0F;
+        --bg-card: #12141D;
+        --bg-subtle: #181B26;
+        --text-primary: #F8FAFC;
+        --text-secondary: #94A3B8;
+        --text-muted: #64748B;
+        --accent-primary: #3B82F6;
+        --accent-pass: #10B981;
+        --accent-fail: #F43F5E;
+        --accent-amber: #F59E0B;
+        --border-subtle: #222634;
+        --border-strong: #2E3346;
+        --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 12px 28px -6px rgba(0, 0, 0, 0.45);
+        --card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(59, 130, 246, 0.35);
+      }
+
+      body {
+        font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        background-color: var(--bg-canvas);
+        background-image:
+          radial-gradient(at 12% 0%, rgba(37, 99, 235, 0.07) 0px, transparent 45%),
+          radial-gradient(at 88% 4%, rgba(16, 185, 129, 0.05) 0px, transparent 40%);
+        color: var(--text-primary);
+        margin: 0;
+        padding: 0;
+        transition: background-color 200ms ease, color 200ms ease;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .font-mono {
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .saas-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: 16px;
+        box-shadow: var(--card-shadow);
+        color: var(--text-primary);
+        transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .saas-card-interactive:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--card-hover-shadow);
+        border-color: var(--border-strong);
+      }
+
+      .saas-subtle {
+        background: var(--bg-subtle);
+        border: 1px solid var(--border-subtle);
+        border-radius: 12px;
+      }
+
+      .saas-ide {
+        background: #0D1117;
+        color: #F8FAFC;
+        border: 1px solid #21262D;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      }
+
+      /* Refined inline skill highlight tokens (No ugly spellcheck underlines!) */
+      .skill-chip-pass {
+        display: inline-block;
+        background: rgba(16, 185, 129, 0.12);
+        color: #047857;
+        border: 1px solid rgba(16, 185, 129, 0.28);
+        padding: 0px 6px;
+        margin: 0 1px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.92em;
+        cursor: pointer;
+        transition: all 150ms ease;
+      }
+      html.dark .skill-chip-pass {
+        background: rgba(16, 185, 129, 0.16);
+        color: #34D399;
+        border-color: rgba(16, 185, 129, 0.32);
+      }
+      .skill-chip-pass:hover,
+      .skill-chip-pass.active-skill {
+        background: rgba(16, 185, 129, 0.25);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2);
+      }
+
+      .skill-chip-fail {
+        display: inline-block;
+        background: rgba(225, 29, 72, 0.1);
+        color: #BE123C;
+        border: 1px solid rgba(225, 29, 72, 0.28);
+        padding: 0px 6px;
+        margin: 0 1px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.92em;
+        cursor: pointer;
+        transition: all 150ms ease;
+      }
+      html.dark .skill-chip-fail {
+        background: rgba(244, 63, 94, 0.16);
+        color: #FDA4AF;
+        border-color: rgba(244, 63, 94, 0.35);
+      }
+      .skill-chip-fail:hover,
+      .skill-chip-fail.active-skill {
+        background: rgba(225, 29, 72, 0.22);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(225, 29, 72, 0.22);
+      }
+
+      .dark-scroll::-webkit-scrollbar {
+        width: 7px;
+        height: 7px;
+      }
+      .dark-scroll::-webkit-scrollbar-track {
+        background: #0D1117;
+      }
+      .dark-scroll::-webkit-scrollbar-thumb {
+        background: #30363D;
+        border-radius: 6px;
+      }
+
+      .doc-scroll::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+      }
+      .doc-scroll::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .doc-scroll::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.35);
+        border-radius: 999px;
+      }
+
+      /* Header & Navigation Bar (Light + Dark Precision Styling) */
+      .saas-header {
+        background: rgba(255, 255, 255, 0.88);
+        border-bottom: 1px solid #E2E8F0;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+      }
+      html.dark .saas-header {
+        background: rgba(11, 13, 20, 0.9);
+        border-bottom: 1px solid #1E2332;
+      }
+
+      .saas-nav-track {
+        background: #F1F5F9;
+        border: 1px solid #E2E8F0;
+      }
+      html.dark .saas-nav-track {
+        background: #141824;
+        border: 1px solid #242A3D;
+      }
+
+      .saas-nav-item {
+        color: #475569;
+        border: 1px solid transparent;
+      }
+      .saas-nav-item:hover:not(:disabled) {
+        color: #0F172A;
+        background: rgba(255, 255, 255, 0.55);
+      }
+      html.dark .saas-nav-item {
+        color: #94A3B8;
+        border: 1px solid transparent;
+      }
+      html.dark .saas-nav-item:hover:not(:disabled) {
+        color: #F8FAFC;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .saas-nav-item-active {
+        background: #FFFFFF;
+        color: #2563EB;
+        border: 1px solid #CBD5E1;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+      }
+      html.dark .saas-nav-item-active {
+        background: linear-gradient(180deg, rgba(59, 130, 246, 0.22) 0%, rgba(37, 99, 235, 0.14) 100%);
+        color: #60A5FA;
+        border: 1px solid rgba(59, 130, 246, 0.42);
+        box-shadow: 0 2px 10px rgba(37, 99, 235, 0.2);
+      }
+
+      /* Theme utility mappings for dark mode */
+      html.dark .text-slate-900 {
+        color: #F8FAFC !important;
+      }
+      html.dark .text-slate-800 {
+        color: #F1F5F9 !important;
+      }
+      html.dark .text-slate-700 {
+        color: #E2E8F0 !important;
+      }
+      html.dark .text-slate-600,
+      html.dark .text-slate-500 {
+        color: #94A3B8 !important;
+      }
+      html.dark .text-slate-400 {
+        color: #64748B !important;
+      }
+      html.dark .text-blue-600 {
+        color: #60A5FA !important;
+      }
+      html.dark .text-indigo-600 {
+        color: #818CF8 !important;
+      }
+      html.dark .text-emerald-600,
+      html.dark .text-emerald-700 {
+        color: #34D399 !important;
+      }
+      html.dark .text-rose-600 {
+        color: #FB7185 !important;
+      }
+      html.dark .text-amber-600 {
+        color: #FBBF24 !important;
+      }
+      html.dark .bg-white,
+      html.dark .bg-white\/85,
+      html.dark .bg-white\/95 {
+        background-color: #12151E !important;
+      }
+      html.dark .bg-slate-50,
+      html.dark .bg-slate-100\/80,
+      html.dark .bg-slate-100,
+      html.dark .bg-slate-200 {
+        background-color: #171B26 !important;
+      }
+      html.dark .border-slate-200,
+      html.dark .border-slate-200\/60,
+      html.dark .border-slate-200\/70,
+      html.dark .border-slate-200\/80,
+      html.dark .border-slate-100,
+      html.dark .border-slate-300 {
+        border-color: #242A3D !important;
+      }
+      html.dark textarea,
+      html.dark input[type="text"],
+      html.dark input[type="email"],
+      html.dark input[type="password"],
+      html.dark input[type="number"] {
+        background-color: #0E1118 !important;
+        color: #F8FAFC !important;
+        border-color: #262D40 !important;
+      }
+
+      @keyframes fadeSlideUp {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes scanBar {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(200%);
+        }
+      }
+
+      .animate-screen {
+        animation: fadeSlideUp 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+
+      @media print {
+        body {
+          background: #FFFFFF !important;
+          color: #000000 !important;
+        }
+        .no-print {
+          display: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Load Monaco AMD Loader AFTER React/ReactDOM/PDF.js UMD scripts so window.React is never hijacked by define.amd -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+    <script src="/assets/app-bundle.js?v=21"></script>
+  </body>
+</html>

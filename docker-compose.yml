@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  hireroom-ai:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hireroom-ai-enterprise
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./hireroom_ledger.db:/app/hireroom_ledger.db
+      - ./fine_tuning_dataset.jsonl:/app/fine_tuning_dataset.jsonl
+    restart: unless-stopped
+
